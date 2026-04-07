@@ -1,43 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>BabylonJS Viewer - Basic usage</title>
-        <style>
-			.viewerContainer {
-                width: 400px;
-                height: 500px;				
-				image-rendering: pixelated; /* to prevent blury when zoomed out */
-			}
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babylon Viewer Navbar</title>
 
-        </style>
-		<script src="https://cdn.babylonjs.com/viewer/babylon.viewer.js"></script>
-	<script>
-		function loadit(modelUrl) {
-			if(modelUrl) {
-				let viewer = BabylonViewer.viewerManager.getViewerById('viewerID');
-				let temp = viewer.templateManager.getTemplate('navBar');
-				let param= temp._configuration;
-				param.params.hideVr=false;
-                param.params.disableOnFullscreen=true;
-				temp.updateParams(param);
-				viewer.loadModel(modelUrl)
-			}
-		}
-	</script>
+    <script src="https://cdn.babylonjs.com/viewer/babylon.viewer.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(135deg, #dbeafe, #f0f9ff);
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 900px;
+            max-width: 92%;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        .control-bar {
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px 14px;
+            font-size: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            color: #333;
+            outline: none;
+            min-width: 280px;
+        }
+
+        select:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        .viewer-box {
+            width: 100%;
+            height: 520px;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #f8fafc;
+            box-shadow: inset 0 0 0 1px #e5e7eb;
+        }
+
+        babylon {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #2563eb;
+        }
+    </style>
+
+    <script>
+        function applyNavbarSettings(viewer) {
+            try {
+                let temp = viewer.templateManager.getTemplate('navBar');
+                if (temp) {
+                    let param = temp._configuration;
+                    param.params.hideVr = false;
+                    param.params.disableOnFullscreen = true;
+                    temp.updateParams(param);
+                }
+            } catch (error) {
+                console.log("Navbar settings could not be applied:", error);
+            }
+        }
+
+        function loadit(modelUrl, modelName) {
+            if (modelUrl) {
+                let viewer = BabylonViewer.viewerManager.getViewerById('viewerID');
+                applyNavbarSettings(viewer);
+                viewer.loadModel(modelUrl);
+
+                const note = document.getElementById('model-note');
+                note.textContent = '目前顯示模型：' + modelName;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const defaultViewer = BabylonViewer.viewerManager.getViewerById('viewerID');
+            if (defaultViewer) {
+                applyNavbarSettings(defaultViewer);
+            }
+        });
+    </script>
 </head>
-<body>
-<select onchange="loadit(this.value)">
-	<option value="">select model</option>
-	<option value="./models/alice.glb">Alice</option>
-	<option value="./models/Astronaut.glb">Astronaut</option>
-	<option value="./models/buddha.glb">Buddha</option>
-</select>
-<div class='viewerContainer'>
-	<babylon id="viewerID"><vr></vr></babylon>
-</div>
-</body>
 
+<body>
+    <div class="container">
+        <h1>🧭 Babylon Viewer Navbar</h1>
+        <div class="subtitle">帶有控制列的模型展示頁面</div>
+
+        <hr>
+
+        <div class="control-bar">
+            <select onchange="loadit(this.value, this.options[this.selectedIndex].text)">
+                <option value="./models/blossom_the_powerpuff_girls.glb">Blossom</option>
+                <option value="./models/bubbles_the_powerpuff_girls.glb">Bubbles</option>
+                <option value="./models/buttercup_the_powerpuff_girls.glb">Buttercup</option>
+            </select>
+        </div>
+
+        <div class="viewer-box">
+            <babylon
+                id="viewerID"
+                model="./models/blossom_the_powerpuff_girls.glb"
+                camera-orbit="0deg 75deg 3m"
+                auto-rotate>
+                <vr></vr>
+            </babylon>
+        </div>
+
+        <div class="note" id="model-note">
+            目前顯示模型：Blossom
+        </div>
+
+        <a class="back-btn" href="index.html">⬅ 返回首頁</a>
+    </div>
+</body>
 </html>
